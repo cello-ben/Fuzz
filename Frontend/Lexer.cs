@@ -15,7 +15,7 @@ namespace Fuzz.Frontend
             tokens = new();
         }
 
-        public void ExtractNumericLiteral()
+        public void ExtractNumericLiteral() //TODO refactor into two methods; one for returning a parsed int/float, one for creating & adding tokens to list.
         {
             //Check for float vs. int by way of presence of decimal point. TODO decide on allowing int for float.
             //Edge cases: multiple decimal points, trailing decimal point, leading decimal point.
