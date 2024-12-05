@@ -12,19 +12,19 @@ namespace Fuzz.Util
 
         public HashSet<string> ParseArgs()
         {
-            HashSet<string> parsedArgs = new HashSet<string>();
+            HashSet<string> parsedArgs = new();
             int i = 0;
             while (i < argv.Length)
             {
                 string sanitized = argv[i].Replace("-", String.Empty).ToLower();
                 switch (sanitized)
                 {
-                    case "fuzzfactor":
+                    case "fuzzfactor": //TODO replace with decorator?
                         if (argv.Length > i + 1)
                         {
                             float fuzzFactor;
                             bool parseSuccess = float.TryParse(argv[++i], out fuzzFactor);
-                            if (!parseSuccess || fuzzFactor < 0F || fuzzFactor > 1F)
+                            if (!parseSuccess || fuzzFactor < 0 || fuzzFactor > 1)
                             {
                                 throw new InvalidFlagException("Must pass in a float from 0 to 1 for fuzzfactor.");
                             }
@@ -32,7 +32,7 @@ namespace Fuzz.Util
                         }
                         break;
                     default:
-                        throw new InvalidFlagException("Invalid flag(s) passed in.");
+                        throw new InvalidFlagException($"Invalid flag passed in: {argv[i]}");
                 }
                 i++;
             }

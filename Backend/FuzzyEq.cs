@@ -18,6 +18,7 @@ namespace Fuzz.Backend
             #pragma warning disable CS8604 //We have already done a null check, so we shouldn't need the warning.
             if (typeof(T) == typeof(int))
             {
+
                 Console.WriteLine("FuzzyEq int");
             }
             else if (typeof(T) == typeof(float))

@@ -1,13 +1,96 @@
 using System.Data;
+using Fuzz.Util.Exceptions;
 
 namespace Fuzz.Frontend
 {
+    //TODO catch all exceptions and display all at once.
     public class Lexer
     {
         private string raw;
+        private int idx = 0;
+        private List<object> tokens { get; } //We will only have instances of Token in here, but we can't mix types in a list unless we use generic objects.
         public Lexer(string _raw)
         {
             raw = _raw;
+            tokens = new();
+        }
+
+        public void ExtractNumericLiteral()
+        {
+            //Check for float vs. int by way of presence of decimal point. TODO decide on allowing int for float.
+            //Edge cases: multiple decimal points, trailing decimal point, leading decimal point.
+            //OK: 0.7, not OK: .7
+            string numericLiteralString = String.Empty;
+            int decimalCount = 0;
+            while (idx < raw.Length)
+            {
+                char c = raw[idx++];
+                if (!Char.IsDigit(c) && c != '.')
+                {
+                    switch (c)
+                    {
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            numericLiteralString += c;
+                            break;
+                        case '.':
+                            numericLiteralString += c;
+                            decimalCount++;
+                            if (decimalCount > 1)
+                            {
+                                throw new InvalidNumericLiteralException("Cannot have multiple decimal points in a numeric literal.");
+                            }
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (numericLiteralString.Contains("."))
+            {
+                //TODO check for validity.
+                bool canParse = float.TryParse(numericLiteralString, out float n);
+                if (canParse)
+                {
+                    Token<object> token = new(Token<object>._TokenType.TOK_DATA_TYPE, null);
+                    tokens.Add(token);
+                    token = new(Token<object>._TokenType.TOK_FLOAT_LIT, n);
+                    tokens.Add(token);
+                }
+            }
+            else
+            {
+                bool canParse = int.TryParse(numericLiteralString, out int n);
+                Token<object> token = new(Token<object>._TokenType.TOK_DATA_TYPE, null);
+                tokens.Add(token);
+                token = new(Token<object>._TokenType.TOK_INT_LIT, n);
+                tokens.Add(token);
+            }
+            return;
+        }
+
+        public void Parse() //TODO bool for success, or just throw exception(s)?
+        {
+            
+            while (idx < raw.Length)
+            {
+                char c = raw[idx];
+
+                //idx++;
+            }
         }
     }
 
@@ -29,7 +112,19 @@ namespace Fuzz.Frontend
             TOK_MINUS,
             TOK_TIMES,
             TOK_DIV,
-            TOK_MOD
+            TOK_MOD,
+            TOK_BW_AND,
+            TOK_BW_OR,
+            TOK_BW_XOR,
+            TOK_LSHIFT,
+            TOK_RSHIFT,
+            TOK_BW_NOT,
+            TOK_COMMA, //TODO implement multiple args
+            TOK_RETURNS,
+            TOK_DATA_TYPE,
+            TOK_VAR_NAME,
+            TOK_NEWLINE,
+            TOK_CRLF
             //TODO Do we need TOK_TYPE?
         }
 
@@ -51,6 +146,16 @@ namespace Fuzz.Frontend
                 case _TokenType.TOK_TIMES:
                 case _TokenType.TOK_DIV:
                 case _TokenType.TOK_MOD:
+                case _TokenType.TOK_BW_AND:
+                case _TokenType.TOK_BW_OR:
+                case _TokenType.TOK_BW_XOR:
+                case _TokenType.TOK_LSHIFT:
+                case _TokenType.TOK_RSHIFT:
+                case _TokenType.TOK_BW_NOT:
+                case _TokenType.TOK_COMMA:
+                case _TokenType.TOK_RETURNS:
+                case _TokenType.TOK_NEWLINE:
+                case _TokenType.TOK_CRLF:
                     TokenType = tokenType;
                     break;
                 default:
