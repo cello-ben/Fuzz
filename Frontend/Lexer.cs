@@ -25,7 +25,7 @@ namespace Fuzz.Frontend
             while (idx < raw.Length)
             {
                 char c = raw[idx++];
-                if (!Char.IsDigit(c) && c != '.')
+                if (Char.IsDigit(c) || c != '.' || c == '-')
                 {
                     switch (c)
                     {
