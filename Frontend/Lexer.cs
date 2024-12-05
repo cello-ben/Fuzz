@@ -29,16 +29,7 @@ namespace Fuzz.Frontend
                 {
                     switch (c)
                     {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
+                        case Char.IsDigit(c):
                             numericLiteralString += c;
                             break;
                         case '.':
@@ -49,6 +40,16 @@ namespace Fuzz.Frontend
                                 throw new InvalidNumericLiteralException("Cannot have multiple decimal points in a numeric literal.");
                             }
                             break;
+                        case '-':
+                            if (numericLiteralString.Length == 0)
+                            {
+                                numericLiteralString += c;
+                                break;
+                            }
+                            else
+                            {
+                                throw new InvalidNumericLiteralException("Cannot have a negative sign inside of a numeric literal (prefix only).");
+                            }
                         default:
                             break;
 
