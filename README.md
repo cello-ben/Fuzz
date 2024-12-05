@@ -3,5 +3,4 @@ I have wanted to try my hand at creating a programming language from scratch for
 
 This is still in the extremely early stages of implementation, but I am iterating on it frequently.
 
-#### Generative AI Disclosure
 No generative AI has been used in the creation of this project.
